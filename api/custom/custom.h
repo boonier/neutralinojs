@@ -9,16 +9,18 @@
 using json = nlohmann::json;
 using namespace std;
 
-namespace custom {
+namespace custom
+{
 
-vector<string> getMethods();
+    vector<string> getMethods();
 
-namespace controllers {
+    namespace controllers
+    {
 
-json getMethods(const json &input);
-// json add(const json &input); // Sample custom method
+        json getMethods(const json &input);
+        json add(const json &input); // Sample custom method
 
-} // namespace controllers
+    } // namespace controllers
 
 } // namespace custom
 

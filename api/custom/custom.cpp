@@ -14,83 +14,95 @@ using json = nlohmann::json;
 
 #define NEU_CMETHOD_REGEX "(^custom\\.)(.*)"
 
-namespace custom {
-vector<string> getMethods() {
-    auto methodMap = router::getMethodMap();
-    vector<string> customMethods = {};
-    for(const auto &[methodName, _]: methodMap) {
-        if(methodName == "custom.getMethods") {
-            continue;
-        }
+namespace custom
+{
+    vector<string> getMethods()
+    {
+        auto methodMap = router::getMethodMap();
+        vector<string> customMethods = {};
+        for (const auto &[methodName, _] : methodMap)
+        {
+            if (methodName == "custom.getMethods")
+            {
+                continue;
+            }
 
-        if(regex_match(methodName, regex(NEU_CMETHOD_REGEX))) {
-            string cMethodName = regex_replace(methodName, regex(NEU_CMETHOD_REGEX), "$2");
-            customMethods.push_back(cMethodName);
+            if (regex_match(methodName, regex(NEU_CMETHOD_REGEX)))
+            {
+                string cMethodName = regex_replace(methodName, regex(NEU_CMETHOD_REGEX), "$2");
+                customMethods.push_back(cMethodName);
+            }
         }
+        return customMethods;
     }
-    return customMethods;
-}
 
-namespace controllers {
+    namespace controllers
+    {
 
-json getMethods(const json &input) {
-    json output;
-    output["returnValue"] = custom::getMethods();
-    output["success"] = true;
-    return output;
-}
+        json getMethods(const json &input)
+        {
+            json output;
+            output["returnValue"] = custom::getMethods();
+            output["success"] = true;
+            return output;
+        }
 
+        /*
 
-/*
+          Sample custom method.
+          The client library will automatically add this method to the Neutralino global object.
 
-  Sample custom method.
-  The client library will automatically add this method to the Neutralino global object.
+          Usage examples:
 
-  Usage examples:
+          let sum;
+          sum = await Neutralino.custom.add(10, 10); // 20
+          sum = await Neutralino.custom.add(1, 1, { addExtraFive: true, addExtraTen: true }); // 17
 
-  let sum;
-  sum = await Neutralino.custom.add(10, 10); // 20
-  sum = await Neutralino.custom.add(1, 1, { addExtraFive: true, addExtraTen: true }); // 17
+        */
 
-*/
+        json add(const json &input)
+        {
+            json output;
 
-// json add(const json &input) {
-//     json output;
+            // Validate
+            if (!helpers::hasRequiredFields(input, {"arg0", "arg1"}))
+            {
+                output["error"] = errors::makeMissingArgErrorPayload();
+                return output;
+            }
 
-//     // Validate
-//     if(!helpers::hasRequiredFields(input, {"arg0", "arg1"})) {
-//         output["error"] = errors::makeMissingArgErrorPayload();
-//         return output;
-//     }
+            // Extract input parameters
+            int a, b, sum = 0;
+            a = input["arg0"].get<int>();
+            b = input["arg1"].get<int>();
 
-//     // Extract input parameters
-//     int a, b, sum = 0;
-//     a = input["arg0"].get<int>();
-//     b = input["arg1"].get<int>();
+            // Process
+            sum = a + b;
 
-//     // Process
-//     sum = a + b;
+            // Handle options
+            if (helpers::hasField(input, "addExtraFive"))
+            {
+                if (input["addExtraFive"].get<bool>())
+                {
+                    sum += 5;
+                }
+            }
+            if (helpers::hasField(input, "addExtraTen"))
+            {
+                if (input["addExtraTen"].get<bool>())
+                {
+                    sum += 10;
+                }
+            }
 
-//     // Handle options
-//     if(helpers::hasField(input, "addExtraFive")) {
-//         if(input["addExtraFive"].get<bool>()) {
-//             sum += 5;
-//         }
-//     }
-//     if(helpers::hasField(input, "addExtraTen")) {
-//         if(input["addExtraTen"].get<bool>()) {
-//             sum += 10;
-//         }
-//     }
+            // Return the result
+            output["returnValue"] = sum;
 
-//     // Return the result
-//     output["returnValue"] = sum;
+            // Mark the method call as a successful one
+            output["success"] = true;
 
-//     // Mark the method call as a successful one
-//     output["success"] = true;
+            return output;
+        }
 
-//     return output;
-// }
-
-} // namespace controllers
+    } // namespace controllers
 } // namespace custom
