@@ -129,7 +129,7 @@ map<string, router::NativeMethod> methodMap = {
     {"clipboard.clear", clipboard::controllers::clear},
     // Neutralino.custom
     {"custom.getMethods", custom::controllers::getMethods},
-    // {"custom.add", custom::controllers::add} // Sample custom method
+    {"custom.add", custom::controllers::add} // Sample custom method
 };
 
 map<string, router::NativeMethod> getMethodMap() {
