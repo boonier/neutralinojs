@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <iostream>
 
 #include "helpers.h"
 #include "errors.h"
@@ -18,6 +19,8 @@ namespace custom
 {
     vector<string> getMethods()
     {
+
+        cout << "Getting custom methods" << endl;
         auto methodMap = router::getMethodMap();
         vector<string> customMethods = {};
         for (const auto &[methodName, _] : methodMap)
